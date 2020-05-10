@@ -57,13 +57,16 @@ X. Exit"""
         filteredEmployees = self.model.filterEmployeeAgeRange(minAge, maxAge)["Employees"]
         
         # Bind Model to UI
-        print(f"Employees with ages between and including {minAge} and {maxAge}:")
-        for index, employee in enumerate(filteredEmployees):
-            print(str(index + 1) + ".")
-            print("Last Name:", employee["last_name"])
-            print("First Name:", employee["first_name"])
-            print("Age:", employee["age"])
-            print("--------------------------------")
+        if len(filteredEmployees) == 0:
+            print(f"There are no employees between and including {minAge} and {maxAge}")
+        else:
+            print(f"Employees with ages between and including {minAge} and {maxAge}:")
+            for index, employee in enumerate(filteredEmployees):
+                print(str(index + 1) + ".")
+                print("Last Name:", employee["last_name"])
+                print("First Name:", employee["first_name"])
+                print("Age:", employee["age"])
+                print("--------------------------------")
             
     
     def viewFilterEmployeeCity(self):
@@ -79,13 +82,15 @@ X. Exit"""
         print()
         
         # Call Model
-        filteredEmployees = self.model.filterEmployeeCity(inputCity)["Employees"]
+        modelData = self.model.filterEmployeeCity(inputCity)
+        filteredEmployees = modelData["Employees"]
+        originalCity = modelData["City"]
         
         # Bind Model To UI
         if len(filteredEmployees) == 0:
-            print(f"There are no employees residing in {inputCity}")
+            print(f"There are no employees residing in {originalCity}")
         else:
-            print(f"Employees residing in the city of {inputCity}: ")
+            print(f"Employees residing in the city of {originalCity}: ")
             for index, employee in enumerate(filteredEmployees):
                 print(str(index + 1) + ".")
                 print("Last Name:", employee["last_name"])
@@ -107,13 +112,15 @@ X. Exit"""
         print()
         
         # Call Model
-        employeeCount = self.model.countEmployeeCounty(inputCounty)["Count"]
+        modelData = self.model.countEmployeeCounty(inputCounty)
+        employeeCount = modelData["Count"]
+        originalCounty = modelData["County"]
         
         # Bind Model To UI
         if employeeCount == 0:
-            print(f"There are no employees in {inputCounty}")
+            print(f"There are no employees in {originalCounty}")
         else:
-            print(f"Number of employees in {inputCounty}: {employeeCount}")
+            print(f"Number of employees in {originalCounty}: {employeeCount}")
     
     
     def viewCountEmployeePerEmailProvider(self):
@@ -129,11 +136,13 @@ X. Exit"""
         print()
         
         # Call Model
-        employeeCount = self.model.countEmployeeEmailProvider(inputEmailProvider)["Count"]
+        modelData = self.model.countEmployeeEmailProvider(inputEmailProvider)
+        employeeCount = modelData["Count"]
+        originalEmailProvider = modelData["EmailProvider"]
         
         # Bind Model To UI
         if employeeCount == 0:
-            print(f"There are no employees using {inputEmailProvider} as Email Provder")
+            print(f"There are no employees using {originalEmailProvider} as Email Provder")
         else:
-            print(f"Number of employees using '{inputEmailProvider}' as Email Provider: {employeeCount}")
+            print(f"Number of employees using '{originalEmailProvider}' as Email Provider: {employeeCount}")
     
