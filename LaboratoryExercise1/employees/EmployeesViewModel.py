@@ -1,5 +1,4 @@
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 class EmployeesViewModel:
     def __init__(self, employeesEntityManager):
@@ -13,7 +12,7 @@ class EmployeesViewModel:
         employees = []
         for employee in self._entity.employees.values():
             # get years difference
-            age = relativedelta(datetime.now(), employee["bdate"]).years
+            age = self._getAge(datetime.now(), employee["bdate"])
             if age <= end and age >= start:
                 employee["age"] = age
                 employees.append(employee)
@@ -59,10 +58,21 @@ class EmployeesViewModel:
          
          Example:
          nocasedict = {"Hello World", "Python", "MCL"}
-         print(_getRetrievedValue(noCaseDict, "mcl")) # Returns MCL
+         print(_getRetrievedValue(noCaseDict, "mcl")) # Input: 'mcl' -> output: 'MCL' (because MCL is in nocasedict not mcl)
         """
         originalCase = {key.lower() : key for key in dictionary.keys()}
         return originalCase[value.lower()]
+    
+    def _getAge(self, currentDate, birthDate):
+        age = currentDate.year - birthDate.year - 1
+        
+        if currentDate.month > birthDate.month:
+            age += 1
+            
+        if currentDate.month == birthDate.month and currentDate.day >= birthDate.day:
+            age += 1
+            
+        return age
         
         
     

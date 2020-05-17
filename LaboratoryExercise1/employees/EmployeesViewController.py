@@ -18,12 +18,18 @@ class EmployeesViewController:
         self.model = employeesModel # type: EmployeesModel
     
     def viewMenu(self):
-        menu = """A. Number of Employees
-B. Filter Employees by Given Age Range (in years)
-C. Filter Employees by Given City
-D. Count Employees in Given County
-E. Count Employees using Given Email Provider Site 
-X. Exit"""
+        menu = """--------------------------------------------------------
+  Malayan Colleges Laguna Employee Information System
+--------------------------------------------------------
+Value\tAction
+-----\t------
+  A\tDisplay the Number of Employees
+  B\tFilter Employees by Given Age Range (in years)
+  C\tFilter Employees by Given City
+  D\tCount Employees in Given County
+  E\tCount Employees using Given Email Provider Site 
+  X\tExit
+--------------------------------------------------------"""
         selectionItems = {
             "a" : self.viewEmployeeCount,
             "b" : self.viewFilterEmployeeAgeRange,
@@ -33,7 +39,7 @@ X. Exit"""
             "x" : exit
         }
         print(menu)
-        selection = selectionItems[inputComparator("Enter a value: ", "Please select one of the values", (lambda x: x in selectionItems), force_lower = True)]
+        selection = selectionItems[inputComparator("Please Enter One of the Values: ", "Please select one of the values.", (lambda x: x in selectionItems), force_lower = True, strip = True)]
         selection()
         print()
         self.viewMenu()
@@ -42,43 +48,45 @@ X. Exit"""
     def viewEmployeeCount(self):
         # Call Model
         employeeCount = self.model.employeeCount()['EmployeeCount']
-        
+        print()
         # Bind Model to UI
-        print(f"Number of employees: {employeeCount}")
+        print(f">> Number of Employees: {employeeCount}")
     
+    def isValidMaxAge(self, minAge, maxAge):
+        """ Validate whether the maximum age is valid """
+        if minAge > maxAge:
+            print("Maximum Age Must be Greater Than or Equal to the Minimum Age")
+            return False
+        return True
     
     def viewFilterEmployeeAgeRange(self):
         # Input Age Range
-        print("Enter age range: ")
-        minAge = inputNumber("Input Mimimum Age: ", "Please Enter a valid minimum age", lambda inVal : inVal >= 0)
-        maxAge = inputNumber("Input Maximum Age: ", "Please Enter a valid maximum age", lambda inVal : inVal >= minAge)
+        minAge = inputNumber("Enter Mimimum Age: ", "Please Enter a Valid Minimum Age.", lambda inVal : inVal >= 0)
+        maxAge = inputNumber("Enter Maximum Age: ", "Please Enter a Valid Maximum Age.", lambda inVal : self.isValidMaxAge(minAge, inVal))
+        print()
         
         # Call Model
         filteredEmployees = self.model.filterEmployeeAgeRange(minAge, maxAge)["Employees"]
         
         # Bind Model to UI
         if len(filteredEmployees) == 0:
-            print(f"There are no employees between and including {minAge} and {maxAge}")
+            print(f">> There are No Employees with Ages Between and Including {minAge} and {maxAge}")
         else:
-            print(f"Employees with ages between and including {minAge} and {maxAge}:")
+            print(f">> Employees with Ages Between and Including {minAge} and {maxAge}")
             for index, employee in enumerate(filteredEmployees):
-                print(str(index + 1) + ".")
-                print("Last Name:", employee["last_name"])
-                print("First Name:", employee["first_name"])
-                print("Age:", employee["age"])
-                print("--------------------------------")
+                print(f'>> {index + 1}. Name: {employee["last_name"]}, {employee["first_name"]}\t||\tAge: {employee["age"]}')
             
     
     def viewFilterEmployeeCity(self):
         # Display Available Cities
         cities = self.model.getCities()
         print("Available Cities: ")
-        for city in cities:
+        for city in sorted(cities):
             print(city, end = ", ")
         print()
         
         # Input City
-        inputCity = inputComparator("Enter City: ", "Please Enter a valid City", comparator = notblank)
+        inputCity = inputComparator("Enter City: ", "Please Enter a valid City.", comparator = notblank,strip = True)
         print()
         
         # Call Model
@@ -88,27 +96,23 @@ X. Exit"""
         
         # Bind Model To UI
         if len(filteredEmployees) == 0:
-            print(f"There are no employees residing in {originalCity}")
+            print(f">> There are No Employees Residing in {originalCity}")
         else:
-            print(f"Employees residing in the city of {originalCity}: ")
+            print(f">> Employees Residing in the City of {originalCity}: ")
             for index, employee in enumerate(filteredEmployees):
-                print(str(index + 1) + ".")
-                print("Last Name:", employee["last_name"])
-                print("First Name:", employee["first_name"])
-                print("City:", employee["city"])
-                print("--------------------------------")
+                print(f'>> {index + 1}. \tName: {employee["last_name"]}, {employee["first_name"]}\t||\tCity: {employee["city"]}')
 
                
     def viewCountEmployeePerCounty(self):
         # Display Available Counties
         counties = self.model.getCounties()
         print("Available Countries: ")
-        for county in counties:
+        for county in sorted(counties):
             print(county, end = ", ")
         print()
         
         # Input County
-        inputCounty = inputComparator("Enter County: ", "Please Enter a valid County", comparator = notblank)
+        inputCounty = inputComparator("Enter County: ", "Please Enter a valid County.", comparator = notblank,strip = True)
         print()
         
         # Call Model
@@ -118,21 +122,21 @@ X. Exit"""
         
         # Bind Model To UI
         if employeeCount == 0:
-            print(f"There are no employees in {originalCounty}")
+            print(f">> There are No Employees in {originalCounty}")
         else:
-            print(f"Number of employees in {originalCounty}: {employeeCount}")
+            print(f">> Number of Employees in {originalCounty}: {employeeCount}")
     
     
     def viewCountEmployeePerEmailProvider(self):
         # Display Available Email Providers
         emailProviders = self.model.getEmailProviers()
         print("Available Email Providers: ")
-        for emailProvider in emailProviders:
+        for emailProvider in sorted(emailProviders):
             print(emailProvider, end = ", ")
         print()
         
         # Input Email Provider
-        inputEmailProvider = inputComparator("Enter Email Provider: ", "Please Enter a valid Email Provider", comparator = notblank)
+        inputEmailProvider = inputComparator("Enter Email Provider: ", "Please Enter a valid Email Provider.", comparator = notblank, strip = True)
         print()
         
         # Call Model
@@ -142,7 +146,7 @@ X. Exit"""
         
         # Bind Model To UI
         if employeeCount == 0:
-            print(f"There are no employees using {originalEmailProvider} as Email Provder")
+            print(f">> There are No Employees Using '{originalEmailProvider}' as Email Provder")
         else:
-            print(f"Number of employees using '{originalEmailProvider}' as Email Provider: {employeeCount}")
+            print(f">> Number of Employees Using '{originalEmailProvider}' as Email Provider: {employeeCount}")
     

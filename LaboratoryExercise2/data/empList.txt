@@ -1,0 +1,11 @@
+201911007,Butt,James,Accounting,365.0;
+201203008,Darakjy,Josephine,Marketing,365.0;
+199710014,Venere,Art,Human Resources,750.0;
+201612010,Paprocki,Lenna,Marketing,565.0;
+201710017,Foller,Donette,Admin,450.0;
+201701013,Morasca,Simona,Finance,450.0;
+201011003,Tollner,Mitsue,Marketing,750.0;
+201409015,Dilliard,Leota,Finance,365.0;
+199512017,Wieser,Sage,MIS,750.0;
+199708003,Marrier,Kris,Admin,750.0;
+123456789,Lipat,Job,Marketing,100.0

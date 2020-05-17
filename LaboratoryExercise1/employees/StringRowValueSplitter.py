@@ -1,5 +1,11 @@
 class StringRowValueSplitter:
-    """Splits a row-value 
+    """Splits a string that contains data that is seprated by a row delimiter and a value delimiter
+    
+    Example
+    -------
+    text = "hello,world;red,fox;"               # setup text 
+    splitter = StringRowValueSplitter(',', ';') # instantiate objecct
+    return splitter.parse(text)                 # returns [['hello','world'],['red','fox']]
     
     """
     def __init__(self, valueDeliminator, rowDeliminator):

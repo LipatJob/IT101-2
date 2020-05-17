@@ -1,9 +1,9 @@
 from datetime import datetime
-from requests.structures import CaseInsensitiveDict
+from lib.CaseInsensitiveDict import CaseInsensitiveDict
 from employees.EmployeesEntityManager import EmployeesEntityManager
 
 class EmployeesEntityManagerBuilder:
-    """ Creates an instance an EmployeesEntityManager
+    """ Creates an instance of an EmployeesEntityManager
     
     Attributes
     ----------
@@ -22,7 +22,7 @@ class EmployeesEntityManagerBuilder:
         
     Notes
     -----
-    Implements the builder design pattern. Individual entities does not implement it because entities are implemented as dicts. 
+    Implements the builder design pattern but individual entities does not implement it because entities are implemented as dicts. 
     dict() is used to allow non integer indices and to allow O(1) lookup for non integer indices.
         also does not corrupt data on value deletion
     Builder Pattern: https://sourcemaking.com/design_patterns/builder
@@ -120,20 +120,5 @@ class EmployeesEntityManagerBuilder:
         """ Returns the max index of a list. Max index is used to create a key """
         return len(values.keys())    
     
-    
-"""
-Debug
-from empData import empRecords;
-from CellRow import CellRowSplitterFacade
-import pprint
 
-entityBuilder = EmployeesEntityManagerBuilder()
-entity = entityBuilder.setData(CellRowSplitterFacade(",", ";").parse(empRecords)).build()
-
-pp = pprint.PrettyPrinter(indent=4)
-pp.pprint(entity.cities)
-pp.pprint(entity.counties)
-pp.pprint(entity.states)
-pp.pprint(entity.emailProviders)
-"""
         
