@@ -45,8 +45,8 @@ In this laboratory exercise, I continued the theme of using all the best practic
 | -------| ------------- |
 | [CaseInsensitiveDict](lib/CaseInsensitiveDict.py) | A dictionary where the keys are case insensitive |
 | [Helper](lib/Helper.py) | Helper functions to help UI |
-| [StringRowValueEncoder](lib/StringRowValueEncoder.py) | Converts row-value array to a row-value string |
-| [StringRowValueSplitter](lib/StringRowValueSplitter.py) | Converts row-value string to a row-value array |
+| [FileEncoder](payroll/filestrategy/FileEncoder.py) | Converts row-value array to a row-value string |
+| [FileParser](payroll/filestrategy/FileParser.py) | Converts row-value string to a row-value array |
 
 
 
