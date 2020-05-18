@@ -10,7 +10,7 @@ class FileBound(ABC):
     
     def saveState(self):
         """ Write data of this object to the attached file """
-        dataString = self.dataEncodingStrategy.encode(self.toSerializable())
+        dataString = self.dataEncodingStrategy.encode(self.toArray())
         self.fileHandler.updateData(dataString)
         
         

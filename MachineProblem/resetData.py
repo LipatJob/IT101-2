@@ -1,4 +1,16 @@
-201911007,1,28;
+empList = """201911007,James,Butt,Accounting,365;
+201203008,Josephine,Darakjy,Marketing,365;
+199710014,Art,Venere,Human Resources,750;
+201612010,Lenna,Paprocki,Marketing,565;
+201710017,Donette,Foller,Admin,450;
+201701013,Simona,Morasca,Finance,450;
+201011003,Mitsue,Tollner,Marketing,750;
+201409015,Leota,Dilliard,Finance,365;
+199512017,Sage,Wieser,MIS,750;
+199708003,Kris,Marrier,Admin,750"""
+
+
+empMR = """201911007,1,28;
 201203008,1,28;
 199710014,1,28;
 201612010,1,28;
@@ -37,4 +49,11 @@
 201011003,4,24;
 201409015,4,26;
 199512017,4,28;
-199708003,4,21
+199708003,4,21"""
+
+with open("data/empList.txt", "w") as f:
+    f.write(empList)
+
+with open("data/empMR.txt", "w") as f:
+    f.write(empMR)
+

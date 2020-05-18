@@ -7,4 +7,4 @@
 201011003,Mitsue,Tollner,Marketing,750;
 201409015,Leota,Dilliard,Finance,365;
 199512017,Sage,Wieser,MIS,750;
-199708003,Kris,Marrier,Admin,750
+199708003,Kris,Marrier,Admin,750;

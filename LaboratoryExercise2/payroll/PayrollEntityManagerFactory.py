@@ -1,8 +1,8 @@
 from payroll.entities.filebound.FileBoundEmployeesEntity import FileBoundEmployeesEntity
 from payroll.entities.filebound.FileBoundPayrollsEntity import FileBoundPayrollsEntity
 from payroll.PayrollEntityManager import PayrollEntityManager
-from lib.StringRowValueEncoder import StringRowValueEncoder
-from lib.StringRowValueSplitter import StringRowValueSplitter
+from payroll.filestrategy.FileEncoder import FileEncoder
+from payroll.filestrategy.FileParser import FileParser
 from data.FileDataHandler import FileDataHander
 import os
 
@@ -11,14 +11,14 @@ class PayrollEntityManagerFactory:
     
     def create(self):
         cwd = os.getcwd()
-        employeeEncoder = StringRowValueEncoder(",",";\n")
-        employeeSplitter = StringRowValueSplitter(",",";")
+        employeeEncoder = FileEncoder(",",";\n")
+        employeeSplitter = FileParser(",",";")
         employeeFileHandler = FileDataHander(cwd + "\\data\\empList.txt")
         employee = FileBoundEmployeesEntity(employeeFileHandler, employeeSplitter, employeeEncoder)
         employee.retrieveState()
         
-        payrollEncoder = StringRowValueEncoder(",",";\n")
-        payrollSplitter = StringRowValueSplitter(",",";")
+        payrollEncoder = FileEncoder(",",";\n")
+        payrollSplitter = FileParser(",",";")
         payrollFileHandler = FileDataHander(cwd + "\\data\\empMR.txt")
         payrollRecords = FileBoundPayrollsEntity(payrollFileHandler, payrollSplitter, payrollEncoder)
         payrollRecords.retrieveState(employee)
