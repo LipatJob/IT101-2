@@ -1,15 +1,15 @@
 from cases.entities.CityEntity import CityEntity
-from cases.entities.filebound.FileBound import FileBound
+from cases.filebound.FileBound import FileBound
 
-class FileBoundCity(FileBound, CityEntity):
-    def __init__(self, fileHandler, dataParsingStrategy, dataEncodingStrategy):
-        CityEntity.__init__(self)
+class FileBoundCityEntity(FileBound, CityEntity):
+    def __init__(self, cityName, fileHandler, dataParsingStrategy, dataEncodingStrategy):
+        CityEntity.__init__(self, cityName, {})
         FileBound.__init__(self, fileHandler, dataParsingStrategy, dataEncodingStrategy)
     
     def toSerializable(self):
         """ Convert data into array """
-        arr = []
-        for key, val in super().barangays:
+        arr = [['BRGY', 'CONFIRMED', 'ACTIVE', 'RECOVERED', 'SUSPECT', 'PROBABLE', 'DECEASED']]
+        for key, val in self.barangays.items():
             tempArr = []
             tempArr.append(key)
             tempArr.append(val["Confirmed"])
@@ -24,8 +24,15 @@ class FileBoundCity(FileBound, CityEntity):
     
     def setData(self, data):
         """ Set data from array """
-       # super().resetEmployees()
-        for row in data:
+        self.resetBarangay()
+        for row in data[1:]:
+            brgy = row[0]
+            Confirmed = int(row[1])
+            Active = int(row[2])
+            Recovered = int(row[3])
+            Suspect = int(row[4])
+            Probable = int(row[5])
+            Deceased = int(row[6])
             val = (
                 brgy, {
                     "Confirmed" : Confirmed,
@@ -36,5 +43,6 @@ class FileBoundCity(FileBound, CityEntity):
                     "Deceased" : Deceased
                 }
             )
-            super().addBarangay(val)
+            self.addBarangay(val)
+        
         

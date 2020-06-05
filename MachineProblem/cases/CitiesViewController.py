@@ -1,8 +1,7 @@
-from lib.Helper import inputComparator, inputNumber, notblank, isNumber, isWhole, multipleValidation
-from payroll.entities.EmployeeEntity import EmployeeEntity
-from payroll.entities.PayrollRecordEntity import PayrollRecordEntity
+from lib.Helper import inputComparator, inputNumber, notblank, isNumber, isWhole, multipleValidation, printAsTable, isAlphaOrSpace
+from cases.CitiesViewModel import CitiesViewModel
 
-class PayrollViewController:
+class CitiesViewController:
     """ The class where the User Interface is handled
     
     Args
@@ -16,281 +15,374 @@ class PayrollViewController:
         Where the program queries the needed data
         
     """
-    def __init__(self, payrollModel):
-        self.model = payrollModel
+    def __init__(self, model : CitiesViewModel):
+        self.model = model
     
     
-    def viewMenu(self):
+    def viewMenu(self, response = ""):
         menu =(
         "--------------------------------------------------------\n"\
-        "  Malayan Colleges Laguna Employee Payroll System\n"\
+        "       MCL-CCIS COVID-19 Case Tracker Admin Panel\n"\
         "--------------------------------------------------------\n"\
         "Value\tAction\n"\
         "-----\t------\n"\
-        "  A\tDisplay Employee List\n"\
-        "  B\tAdd Employee\n"\
-        "  C\tAdd Payroll Record\n"\
-        "  D\tGenerate Payroll Record\n"\
+        "  A\tSelect Tracked City\n"\
+        "  B\tAdd City to Track\n"\
         "  X\tExit\n"\
         "--------------------------------------------------------"
         )
+        
+        print(menu)
+        if response != None and response != "":
+            print(">",response)
+        
         selectionItems = {
-            "a" : self.viewEmployeeList,
-            "b" : self.viewAddEmployee,
-            "c" : self.viewAddPayrollRecord,
-            "d" : self.viewGeneratePayrollRecord,
+            "a" : self.selectCity,
+            "b" : self.createCasesForCity,
             "x" : exit
         }
         
-        print(menu)
+
         selection = selectionItems[inputComparator(message = "Please Enter One of the Values: ", 
                                                    errorMessage = "Please select one of the values.", 
-                                                   comparator = multipleValidation((lambda x: x in selectionItems), self._selectionEmployeesNotNull), 
+                                                   comparator = multipleValidation((lambda x: x in selectionItems)), 
                                                    force_lower = True, strip = True)]
-        selection()
+        response = selection()
         print()
-        self.viewMenu()
-        
-        
-    def viewEmployeeList(self):
-        employees = self.model.getEmployeeList()
-        # 0 - EmployeeID, 1 - First Name, 2 - Last Name, 3 - Department, 4 - Rate Per Hour
-        for employee in employees:
-            print(f"ID: {employee.employeeNumber}\tName: {employee.lastName}, {employee.firstName}\tDepartment: {employee.department}\tRate/Hour: {employee.ratePerHour}")
-
-
-    def viewAddEmployee(self):
-        # Create Entity
-        employee = EmployeeEntity()
-        
-        # Populate Entity
-        employee.employeeNumber = inputComparator(message = "Enter Employee Number: ", 
-                                                  errorMessage = "Please Enter a Valid Employee Number.", 
-                                                  comparator = self._validateNewEmployeeNumber, 
-                                                  strip = True)
-        employee.lastName       = inputComparator(message = "Enter Last Name: ", 
-                                                  errorMessage = "Please Enter a Valid Last Name.", 
-                                                  comparator = self._validateName, 
-                                                  strip = True)
-        employee.firstName      = inputComparator(message = "Enter First Name: ", 
-                                                  errorMessage = "Please Enter a Valid First Name.", 
-                                                  comparator = self._validateName, 
-                                                  strip = True)
-        employee.department     = self.model.getDepartments()[inputComparator(message = "Available Departments: Accounting, Marketing, Human Resources, Finance, MIS, Admin\nEnter Department: ", 
-                                                                       errorMessage = "Please Enter a Valid Department.", 
-                                                                       comparator = self._validateDepartment, 
-                                                                       strip = True)]
-        employee.ratePerHour    = inputNumber(message = "Enter Rate Per Hour: ", 
-                                              errorMessage = "Please Enter a Valid Rate.", 
-                                              comparator = self._validateRate, 
-                                              floatingPoint = True)
-        
-        # Call Model
-        self.model.addEmployee(employee)
-        print("Employee Added")
-    
-    
-    def viewAddPayrollRecord(self):
-        # Create Entity
-        payrollRecord = PayrollRecordEntity()
-        
-        self.viewEmployeeList()
-        # Populate Entity
-        payrollRecord.employee = self.model.getEmployee(inputComparator(message = "Enter Employee Number: ",
-                                                                        errorMessage = "Please Enter a Valid Employee Number.", 
-                                                                        comparator = multipleValidation(self._validateExistingEmployeeNumber, self._notFullRecord), 
-                                                                        strip = True))
-        # Get the set difference of all the months and the months the employee has 
-        availableMonths = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12} - self.model.getMonthOfEmployeeRecords(payrollRecord.employee.employeeNumber)
-        print("Available Months: ", end = "")
-        for month in availableMonths: 
-            # Display all available months
-            print(month, end = " ")
+        self.viewMenu(response)
         print()
-        payrollRecord.month          = inputNumber(message = "Enter Month: ", 
-                                                   errorMessage = "Please Enter a Valid Month.", 
-                                                   comparator = multipleValidation(self._validateMonth, self._notFullRecord, self._noRecordExists(payrollRecord.employee.employeeNumber)))
-        payrollRecord.daysWorked     = inputNumber(message = "Enter Days Worked: ", 
-                                                   errorMessage = "Please Enter Valid Days Worked.", 
-                                                   comparator = self._validateDaysWorked(payrollRecord.month))
         
-        # Call Model
-        self.model.addPayrollRecord(payrollRecord)
-        print("Payroll Record Added")
-    
-    def viewGeneratePayrollRecord(self):
-        if len(self.model.getRecordEmployeeNumbers()) == 0:
-            print("There are no Records")
+        
+    def selectCity(self):
+        # If there are no cities
+        if not self._cityCountMoreThanZero:
+            print("There are No Tracked Cities")
             return
         
-        self.viewEmployeeList()
-        employeeNumber = inputComparator(message = "Enter Employee Number: ", 
-                                         errorMessage = "Please Enter a Valid Employee Number.", 
-                                         comparator = multipleValidation(self._validateExistingEmployeeNumber, self._existingEmployeeNumber, self._hasRecord), 
-                                         strip = True)
-        months = self.model.getMonthOfEmployeeRecords(employeeNumber)
-        print("Available Months: ", end = "")
-        for month in months: print(month, end = " ")
+        # Display Available Cities
+        cityNames = sorted(list(self.model.getCityNames()))
+        print("Available Cities: ")
+        for cityName in cityNames:
+            print(cityName)
+        
+        city = inputComparator(message = "Enter City Name: ", 
+                               errorMessage = "Please select one of the values.", 
+                               comparator = multipleValidation(self._validateSelectCity), 
+                               force_lower = True, strip = True)
+        
+        city = self.model.getOriginalCityNameCase(city)
+        self.viewCity(city)
+        
+        
+    def viewCity(self, selectedCity, response = ""):
+        menu = (
+        f"--------------------------------------------------------\n"\
+        f"       MCL-CCIS COVID-19 Case Tracker Admin Panel\n"\
+        f"--------------------------------------------------------\n"\
+        f"Value\tAction\n"\
+        f"-----\t------\n"\
+        f"  A\tView Cases for City\n"\
+        f"  B\tEdit Cases for City\n"\
+        f"  C\tAdd Barangay\n"\
+        f"  D\tDelete Barangay\n"\
+        f"  X\tBack\n"\
+        f"\n"
+        f"Selected City: {selectedCity}\n"\
+        f"--------------------------------------------------------"
+        )
+        print(menu)
+        if response != None and response != "":
+            print(">",response)
+        
+        selectionItems = {
+            "a" : self.viewCasesForCity,
+            "b" : self.editCasesForCity,
+            "c" : self.addBarangay,
+            "d" : self.deleteBarangay,
+            "x" : "x",
+        }
+        
+        selection = inputComparator(message = "Please Enter One of the Values: ", 
+                                    errorMessage = "Please select one of the values.", 
+                                    comparator = (lambda x: x in selectionItems), 
+                                    force_lower = True, strip = True)
+        if selection == "x":
+            return
+        
+        response = selectionItems[selection](selectedCity)
         print()
-        month = inputNumber(message = "Enter Month: ", 
-                            errorMessage = "Please Enter a Valid Month.", 
-                            comparator = multipleValidation(self._validateMonth, self._hasRecordForMonth(employeeNumber)))
+        self.viewCity(selectedCity, response)
+        print()
         
-        payrollView = self.model.generatePayrollRecord(employeeNumber, month)
         
-        print(f"=================================================================\n"
-              f"Payslip for the Month of {payrollView.month}\n"
-              f"Employee No.: {payrollView.employeeNumber}\t\tEmployee Name: {payrollView.employeeName}\n"
-              f"Department:   {payrollView.department}\n"
-              f"Rate per Day: {payrollView.ratePerDay}\t\t\tNo. of Days Worked: {payrollView.daysWorked}\n"
-              f"Gross Pay:    {payrollView.grossPay}\n"
-              f"=================================================================")
-    
-    
-    # VALIDATORS    
-    def _selectionEmployeesNotNull(self, value):
-        if(value == 'b'):
-            return True
+    def viewCasesForCity(self, cityName):
+        city = self.model.getCity(cityName)
+        barangay = city.barangays.items()
+        if len(barangay) == 0:
+            return f"There are No Tracked Barangays For {cityName}"
         
-        if len(self.model.getEmployeeList()) == 0:
-            print("There are No Employees")
-            return False
-        return True
-    
-    
-    def _validateNewEmployeeNumber(self, value):
-        """ Employee Number must be 9 digits """
-        if len(value) != 9:
-            print("Employee Number Must be 9 digits")
-            return False
-        
-        for digit in value:
-            if not isNumber(digit):
-                print("Employee Number May Only Contain Numbers")
-                return False
-        
-        if value in self.model.getEmployeeNumbers():
-            print("Please Enter a Unique Employee Number")
-            return False
-        
-        return True
-    
-    
-    def _validateExistingEmployeeNumber(self, value):
-        """ Employee Number must be 9 digits """
-        if len(value) != 9:
-            print("Employee Number Must be 9 digits")
-            return False
-        
-        for digit in value:
-            if not isNumber(digit):
-                print("Employee Number May Only Contain Numbers")
-                return False
-        
-        if value not in self.model.getEmployeeNumbers():
-            print("Please Enter an ID of an Existing Employee")
-            return False
-        
-        return True
-    
-    
-    def _noRecordExists(self, employeeNumber):
-        """ Employe Should have no record for the month """
-        monthEmployeeRecords = self.model.getMonthOfEmployeeRecords(employeeNumber)
-        
-        def validate(month):    
-            if month in monthEmployeeRecords:
-                print("Employee Must Have No Record for the selected Month")
-                return False
-            return True
-        
-        return validate
+        print(f"Cases for {cityName}")
+        data = [['BARANGAY', 'CONFIRMED', 'ACTIVE', 'RECOVERED', 'SUSPECT', 'PROBABLE', 'DECEASED']]
+        for barangayName, barangayData in barangay:
+            brgyRow = []
+            brgyRow.append(barangayName)
+            brgyRow.append(barangayData["Confirmed"])
+            brgyRow.append(barangayData["Active"])
+            brgyRow.append(barangayData["Recovered"])
+            brgyRow.append(barangayData["Suspect"])
+            brgyRow.append(barangayData["Probable"])
+            brgyRow.append(barangayData["Deceased"])
+            data.append(brgyRow)
+        data[1:] = sorted(data[1:], key = lambda val: val[1], reverse = True)
+        printAsTable(data)
 
-    
-    def _validateName(self, value):
-        """ Name must be characters only """
-        if not value.isalpha():
-            print("Name Must be Characters Only")
-            return False
-        return True
-    
-    
-    def _validateDepartment(self, value):
-        """ Department must one of the following: Accounting, Marketing, Human Resources, Finance, MIS, Admin """
-        departments = self.model.getDepartments()
-        if value.lower() not in departments:
-            print("Department must one of the following: Accounting, Marketing, Human Resources, Finance, MIS, Admin")
-            return False
-        return True
-    
-    
-    def _validateRate(self, value):
-        """ Must be real number """
-        if not (value >=0 and isNumber(value, floatingPoint = True)):
-            print("Rate must be a positive real number")
-            return False
-        return True
-    
-    
-    def _existingEmployeeNumber(self, value):
-        """  """
-        employeeNumbers = self.model.getEmployeeNumbers()
-        if value not in employeeNumbers:
-            print("")
-            return False
-        return True
-    
-    
-    def _validateMonth(self, value):
-        if value > 12 or value < 1:
-            print("Please Enter a Value from 1 to 12")
-            return False
-        if not isWhole(value):
-            print("Please Enter a Whole Number")
-            return False
+
+    def editCasesForCity(self, cityName):
+        city = self.model.getCity(cityName)
+        # Display Available Barangays
+        barangays = self.model.getBarangays(cityName)
         
+        if len(barangays) == 0:
+            return f"There are No Tracked Barangays for {cityName}"
+            
+        
+        for barangay in barangays:
+            print(barangay)
+        
+        # Input Barangay Name
+        barangayName = inputComparator(message = "Enter Barangay Name: ", 
+                            errorMessage = "Please Enter a Valid Barangay Name.", 
+                            comparator = multipleValidation(self._validateBarangayExists(cityName)),
+                            force_lower = True, strip = True)
+        barangayName = self.model.getCaseInsensitiveBarangayNames(cityName)[barangayName]
+        barangay = dict(city.getBarangay(barangayName))
+        
+        # Display Details of Barangay
+        print(
+            f"Select Field to Edit\n"
+            f"A. Active: {barangay['Active']}\n"
+            f"B. Recovered: {barangay['Recovered']}\n"
+            f"C. Suspect: {barangay['Suspect']}\n"
+            f"D. Probable: {barangay['Probable']}\n"
+            f"E. Deceased: {barangay['Deceased']}\n"
+            f"X. Back"
+        )
+        
+        selection = {"a" : "Active",
+                     "b" : "Recovered",
+                     "c" : "Suspect",
+                     "d" : "Probable",
+                     "e" : "Deceased",
+                     "x" : "x"}
+        editSelection = inputComparator(message = "Please Select One of the Values: ", 
+                            errorMessage = "Please Enter a Valid Value.", 
+                            comparator = multipleValidation(lambda val: val in selection), 
+                            force_lower = True, strip = True)
+        
+        if editSelection == "x": # Go back
+            return
+       
+        newBarangay = self.editBarangayCaseValue(cityName, barangayName, selection[editSelection])
+        self.model.editBarangay(cityName,barangayName, newBarangay)     
+        # Input Value
+        print("Successfully Edited Barangay Values")
+        
+        if input("Enter 'Y' to Edit Another Barangay:").lower() == "y":
+            self.editCasesForCity(cityName)
+    
+    
+    def editBarangayCaseValue(self, cityName, barangayName, field):
+        city = self.model.getCity(cityName)
+        barangay = dict(city.getBarangay(barangayName))
+        
+        def negativeToZero(val):
+            return 0 if val < 0 else val
+        
+        if field == "Barangay Name":
+            pass
+        elif field == "Active":
+            # Display Current value
+            print("Current Value of Active:",barangay["Active"])
+                        
+            # Update Value
+            barangay["Active"] = inputNumber(message = "Please Enter New Value: ", 
+                            errorMessage = "Please Enter a Valid Value.", 
+                            comparator = multipleValidation(lambda val: val >= 0))
+            
+            # Change other values
+            barangay["Confirmed"] = barangay["Active"] + barangay["Recovered"] + barangay["Deceased"]
+            
+        elif field == "Recovered":
+            # Display Current value
+            print("Current Value of Recovered:",barangay["Recovered"])
+            
+            # Update Value
+            barangay["Recovered"] = inputNumber(message = "Please Enter New Value: ", 
+                            errorMessage = "Please Enter a Valid Value.", 
+                            comparator = multipleValidation(lambda val: val >= 0))
+            
+            # Ask User if Adjust Active Cases
+            if input("Enter `Y to Adjust Active Cases: ").lower() == "y":
+                barangay["Active"] = negativeToZero(barangay["Confirmed"] - (barangay["Recovered"] + barangay["Deceased"]))
+                print("Active Cases Adjusted")
+                
+            # Change other values
+            barangay["Confirmed"] = barangay["Active"] + barangay["Recovered"] + barangay["Deceased"]
+            
+        elif field == "Suspect":
+            # Display Current value
+            print("Current Value of Suspect:",barangay["Suspect"])
+            
+            # Update Value
+            barangay["Suspect"] = inputNumber(message = "Please Enter New Value: ", 
+                            errorMessage = "Please Enter a Valid Value.", 
+                            comparator = multipleValidation(lambda val: val >= 0))
+            
+        elif field == "Probable":
+            # Display Current value
+            print("Current Value of Probable:",barangay["Probable"])
+            
+            # Update Value
+            barangay["Probable"] = inputNumber(message = "Please Enter New Value: ", 
+                            errorMessage = "Please Enter a Valid Value.", 
+                            comparator = multipleValidation(lambda val: val >= 0))
+            
+        elif field == "Deceased":
+            # Display Current value
+            print("Current Value of Deceased:",barangay["Deceased"])
+            
+            # Update Value
+            barangay["Deceased"] = inputNumber(message = "Please Enter New Value: ", 
+                            errorMessage = "Please Enter a Valid Value.", 
+                            comparator = multipleValidation(lambda val: val >= 0))
+            
+            # Ask user if Adjust Active Case
+            if input("Enter `Y to Adjust Active Cases: ").lower() == "y":
+                barangay["Active"] = negativeToZero(barangay["Confirmed"] - (barangay["Recovered"] + barangay["Deceased"]))
+                print("Active Cases Adjusted")
+                
+            # Change other values
+            barangay["Confirmed"] = barangay["Active"] + barangay["Recovered"] + barangay["Deceased"]
+        return barangay
+    
+
+    def addBarangay(self, cityName):
+        barangayName = inputComparator(message = "Enter Barangay Name to Add: ", 
+                            errorMessage = "Please Enter a Valid Barangay Name.", 
+                            comparator = multipleValidation(self._validateAddBarangay(cityName)), 
+                            force_lower = False, strip = True).upper()
+        self.model.addBarangay(cityName, barangayName)
+        return "Barangay Successfully Added"
+    
+
+    def deleteBarangay(self, cityName):
+        barangays = self.model.getBarangays(cityName)
+
+        if len(barangays) == 0:
+            return f"There are No Tracked Barangays for {cityName}"
+            
+        
+        # Display Available Barangays
+        for barangay in barangays:
+            print(barangay)
+        
+        # Input Barangay Name
+        barangayName = inputComparator(message = "Enter Barangay Name to Delete: ", 
+                            errorMessage = "Please Enter a Valid Barangay Name.", 
+                            comparator = multipleValidation(self._validateDeleteBarangay(cityName)), 
+                            force_lower = False, strip = True)
+        barangayName = self.model.getCaseInsensitiveBarangayNames(cityName)[barangayName]
+        
+        # Delete Barangay
+        self.model.deleteBarangay(cityName, barangayName)
+        return "Barangay Successfully Removed"
+
+
+    def createCasesForCity(self):
+        cityNames = self.model.getCityNames()
+        print("Existing Cities: ")
+        for cityName in cityNames:
+            print(cityName)
+        city = inputComparator(message = "Enter City Name to Add: ", 
+                               errorMessage = "Please Enter a Valid City Name.", 
+                               comparator = multipleValidation(self._validateCreateCasesForCity), 
+                               force_lower = False, strip = True).title()
+        self.model.addCity(city)
+        return "City Successfully Added"
+    
+    
+    
+    # VALIDATION
+    
+    
+    def _cityCountMoreThanZero(self, val):
+        return self.model.getCityCount() > 0
+    
+    
+    def _validateSelectCity(self, city):
+        if not self.model.doesCityExist(city):
+            print("Please Enter an Existing City")
+            return False
         return True
     
     
-    def _validateDaysWorked(self, month):
-        """         jan  feb mar apr may jun jul aug sep oct nov dec"""
-        monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-        month = month - 1
-        def validate(days):
-            if not isWhole(days) or days > monthDays[month] or days < 1:
-                print(f"Please Enter a Number From 1 to {monthDays[month]}")
+    def _validateCreateCasesForCity(self, val):
+        # City is not blank
+        if not self._validateCityName(val):
+            return False
+        # City does not exist
+        if self._cityNameExists(val):
+            print("City Already Exists")
+            return False
+        return True
+    
+    def _validateCityName(self, val):
+        if len(val) == 0:
+            return False
+        if val.isspace():
+            return False
+        for letter in val:
+            if not (letter.isalpha() or letter == " " or letter == "."):
+                return False
+        return True
+    
+    def _validateAddBarangay(self, cityName):
+        barangays = self.model.getCaseInsensitiveBarangayNames(cityName)
+        def validate(barangayName):
+            if barangayName in barangays:
+                print("Barangay Already Exists")
+                return False
+            if len(barangayName.strip()) == 0:
                 return False
             return True
-        
         return validate
     
     
-    def _hasRecord(self, employeeNumber):
-        """ Employee Must Have Existing Recod """
-        records  = self.model.getRecordEmployeeNumbers()
-        
-        if employeeNumber not in records:
-            print("Employee Must Have Existing Record")
-            return False
-        return True
-    
-    
-    def _hasRecordForMonth(self, employeeNumber):
-        """ Employee Must Have Existing Record for the Month """
-        def validate(month):
-            if employeeNumber not in self.model.getRecordEmployeeNumbersForMonth(month):
-                print("Employee Must Have Existing Record for the Month")
+    def _validateDeleteBarangay(self, cityName):
+        barangays = self.model.getCaseInsensitiveBarangayNames(cityName)
+        def validate(barangayName):
+            if barangayName not in barangays:
+                print("Barangay Doesn't Exist")
                 return False
             return True
-        
         return validate
-        
     
-    def _notFullRecord(self, id):
-        """ Employee must not have a full record"""
-        if len(self.model.getMonthOfEmployeeRecords(id)) == 12:
-            print("Current Employee has full records")
-            return False
-        return True
+    def _validateBarangayExists(self, cityName):
+        barangays = self.model.getCaseInsensitiveBarangayNames(cityName)
+        def validate(barangayName):
+            if barangayName not in barangays:
+                print("Barangay Doesn't Exist")
+                return False
+            return True
+        return validate
+    
+
+    def _cityNameExists(self, cityName):
+        cityNames = self.model.getCaseInsensitiveCityNames()
+        return cityName in cityNames
+    
+    def _barangayNameExists(self, cityName):
+        cityNames = self.model.getCaseInsensitiveCityNames()
+        return cityName in cityNames
     
     

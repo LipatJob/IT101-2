@@ -1,6 +1,1 @@
-{
-    "cities":[
-        ["Santa Rosa", "StaRosaCase.txt"],
-        ["Cabuyao", "CabuyaoCase.txt"]
-    ]
-}
+{"cities": [["Sta Rosa", "StaRosaCase.txt"], ["Cabuyao", "CabuyaoCase.txt"]]}

@@ -1,8 +1,7 @@
 from datetime import datetime
-from payroll.entities.PayrollRecordEntityView import PayrollRecordEntityView
 from lib.CaseInsensitiveDict import CaseInsensitiveDict
 
-class PayrollViewModel:
+class CitiesViewModel:
     """ Queries entities to be used in ControllerView """
     def __init__(self, entity, cityFactory):
         self._entity = entity
@@ -10,29 +9,86 @@ class PayrollViewModel:
         
         
     def getCityNames(self):
-        return [city.cityName for city in self._entity.cities]
+        return {city.cityName for city in self._entity.getCities()}
     
+    def doesCityExist(self, city):
+        cities = self.getCaseInsensitiveCityNames()
+        return city in cities
+    
+    def getCaseInsensitiveCityNames(self):
+        cities = CaseInsensitiveDict()
+        for city in self._entity.getCities():
+            cityName = city.cityName.lower()
+            cities[cityName] = cityName
+        return cities
+    
+    def getOriginalCityNameCase(self, cityName):
+        for city in self._entity.getCities():
+            if city.cityName.lower() == cityName:
+                return city.cityName 
+        return cityName
+    
+    def getCityCount(self):
+        return len(self._entity.getCities())
     
     def getCity(self, cityName):
         return self._entity.getCity(cityName)
     
     
     def addCity(self, cityName):
-        city = cityFactory.create(cityName)
+        fileName = cityName.replace(" ","") + "Case.txt"
+        city = self.cityFactory.create(cityName, fileName)
+        city.saveState()
         self._entity.addCity(city)
         self._entity.saveState()
-        city.saveState()
 
+    def getCaseInsensitiveBarangayNames(self, cityName):
+        city = self._entity.getCity(cityName)
+        barangayNames = CaseInsensitiveDict()
+        
+        for barangayName in city.getBarangays():
+            barangayNames[barangayName] = barangayName
+            
+        return barangayNames 
     
-    def addBarangay(self, city, barangay):
+    
+    def addBarangay(self, cityName, barangayName):
+        city = self.getCity(cityName)
+        barangay = self.getDefaultBarangay(barangayName)
         city.addBarangay(barangay)
+        city.saveState()
     
     
-    def deleteBarangay(self, city, barangayName):
-        city.removeBarangay(barangayName)
+    def deleteBarangay(self, cityName, barangayName):
+        city = self.getCity(cityName)
+        city.deleteBarangay(barangayName)
+        city.saveState()
+    
+    
+    def editBarangay(self,cityName, barangayName, data):
+        city = self.getCity(cityName)
+        city.editBarangay(barangayName, data)
+        city.saveState()
+        
+    def getBarangays(self, cityName):
+        city = self.getCity(cityName)
+        return city.getBarangays()
+    
+    def getDefaultBarangay(self, barangayName):
+        val = (
+                barangayName, {
+                    "Confirmed" : 0,
+                    "Active" : 0,
+                    "Recovered" : 0,
+                    "Suspect" : 0,
+                    "Probable" : 0,
+                    "Deceased" : 0
+                }
+        )
+        return val
         
         
-    def updateData(self, city, newData):
+        
         
     
         

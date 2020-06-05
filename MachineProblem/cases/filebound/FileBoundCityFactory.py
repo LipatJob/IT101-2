@@ -1,10 +1,15 @@
 from lib.StringRowValueEncoder import StringRowValueEncoder
-from lib.StringRowValueSplitter import StringRowValueSplitter
+from lib.StringRowValueDecoder import StringRowValueDecoder
 from data.FileDataHandler import FileDataHandler
-from cases.entities.CityEntity import CityEntity
+from cases.filebound.FileBoundCityEntity import FileBoundCityEntity
+import os
+
 class FileBoundCityEntityFactory:
     def create(self, cityName, fileLocation):
-        fileHandler = FileDataHandler(fileLocation)
+        cwd = os.getcwd()
+        
+        fileHandler = FileDataHandler(cwd + "\\data\\" + fileLocation)
         dataEncodingStrategy = StringRowValueEncoder(",","\n")
-        dataParsingStrategy = StringRowValueSplitter(",","\n")
-        return FileBoundCity(fileHandler, dataParsingStrategy, dataEncodingStrategy)
+        dataDecodingStrategy = StringRowValueDecoder(",","\n")
+        city = FileBoundCityEntity(cityName, fileHandler, dataDecodingStrategy, dataEncodingStrategy)
+        return city

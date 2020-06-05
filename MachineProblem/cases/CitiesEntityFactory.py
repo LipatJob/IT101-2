@@ -1,22 +1,21 @@
-from payroll.entities.filebound.FileBoundEmployeesEntity import FileBoundEmployeesEntity
-from payroll.entities.filebound.FileBoundPayrollsEntity import FileBoundPayrollsEntity
-from payroll.PayrollEntityManager import PayrollEntityManager
-from lib.StringRowValueEncoder import StringRowValueEncoder
-from lib.StringRowValueSplitter import StringRowValueSplitter
-from data.FileDataHandler import FileDataHander
+from cases.filebound.FileBoundCityFactory import FileBoundCityEntityFactory
+from cases.filebound.FileBoundCitiesEntity import FileBoundCitiesEntity
+from lib.JsonEncoder import JsonEncoder
+from lib.JsonDecoder import JsonDecoder
+from data.FileDataHandler import FileDataHandler
 import os
 
-class PayrollEntityManagerFactory:
+class CitiesEntityFactory:
     """ Factory class for PayrollEntityManager. Creates FileBoundEntities instead of normal entities """
     
     def create(self):
         cwd = os.getcwd()
-        encoder = StringRowValueEncoder(",","\n")
-        splitter = StringRowValueSplitter(",","\n")
-        fileHandler = FileDataHander(cwd + "\\data\\empList.txt")
-        factory = FileBoundCityFactory()
-        cities = FileBoundCities(fileHandler, splitter, encoder, factory)
+        encoder = JsonEncoder()
+        decoder = JsonDecoder()
+        metadatafileHandler = FileDataHandler(cwd + "\\data\\metadata.json")
+        factory = FileBoundCityEntityFactory()
+        cities = FileBoundCitiesEntity(metadatafileHandler, decoder, encoder, factory)
         cities.retrieveState()
         
-        return PayrollEntityManager(cities)
+        return cities
         
