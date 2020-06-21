@@ -15,7 +15,7 @@ class PayrollRecordEntity:
         
 class PayrollRecordEntityView:
     def __init__(self, month = "", employeeNumber = "", employeeName = "", 
-                 department = "", position = "", ratePerDay = 0, daysWorked = 0, grossPay = 0):
+                 department = "", position = "", ratePerDay = 0, daysWorked = 0, grossPay = 0, allowance = 0):
         self.month = month
         self.employeeNumber = employeeNumber
         self.employeeName = employeeName
@@ -24,6 +24,7 @@ class PayrollRecordEntityView:
         self.ratePerDay = ratePerDay
         self.daysWorked = daysWorked
         self.grossPay = grossPay
+        self.allowance = allowance
         
         
 class PayrollRecordsEntity:

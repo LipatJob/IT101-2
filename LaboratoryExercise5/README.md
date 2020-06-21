@@ -2,16 +2,15 @@
  
 # Preface to Checker/Reader
 
-Laboratory Exercise 2
+Laboratory Exercise 5
 
 Author: Job Lipat
 
-Date Created: May 17, 2020
+Date Created: June 21, 2020
 
 Notes:
 
-In this laboratory exercise, I continued the theme of using all the best practices that I know. I used a 3-tier architecture: the presentation layer where the UI functionalities are handled; the Business Logic layer where the data is queried; and the persistence layer where data is stored and retrieved. I designed the application so that each layer is encapulated as much as possible and knows little of each other and only interacts when needed. For example, the ViewModel doesn't know anything about how the Entity's data is serialized and it only knows that it should commit the model's state. I achieved this by making a class inherit FileBound and an Entity and the FileBound class is also abstract to allow entities to define how their data is could be used in serializing and deserializing. This allowed the program to do polymorphism and to treat the class as just another entity. The application also uses the factory pattern to allow dependency injection on the *strategy* of serializing and deserializing the values in the file. This means that the entity FileHandler is not responsible for *how* the data is going to be serialized or deserialized; instead, the factory injects the strategy to the entities. The application also uses a pseudo-MVC pattern as could be seen in the naming convention. I have also made a [testing plan](docs/Testing%20Plan.docx) (which is in the docs folder) to verify conformity to instructions. I could maybe improve on the file structure of the program so that modules are easier to find.
-
+I'm sorry that I have given up documenting my code. I realized that documenting code takes too much time and I have to do something about it. In the future, I will try to create/use a auto documentor that compiles the docuemntation of all modules. That way I just have to update the documentation on the code and not the document itself. 
 
 ## Responsibilities of Modules:
 

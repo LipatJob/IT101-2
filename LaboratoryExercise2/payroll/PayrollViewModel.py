@@ -1,6 +1,7 @@
 from datetime import datetime
 from payroll.entities.PayrollRecordEntityView import PayrollRecordEntityView
 from lib.CaseInsensitiveDict import CaseInsensitiveDict
+import os
 
 class PayrollViewModel:
     """ Queries entities to be used in ControllerView """
@@ -75,6 +76,12 @@ class PayrollViewModel:
                 employeeNumbers.add(record.employee.employeeNumber)
         
         return employeeNumbers
+    
+    def generatePaySlip(self, payroll, payrollView):
+        fileName = os.getcwd() + "/data/" + payrollView.employeeNumber + payrollView.month+".txt"
+        with open(fileName, "w") as f:
+            f.write(payroll)
+            
         
 
     

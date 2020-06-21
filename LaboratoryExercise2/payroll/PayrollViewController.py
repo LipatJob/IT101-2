@@ -1,4 +1,4 @@
-from lib.Helper import inputComparator, inputNumber, notblank, isNumber, isWhole, multipleValidation
+from lib.Helper import *
 from payroll.entities.EmployeeEntity import EmployeeEntity
 from payroll.entities.PayrollRecordEntity import PayrollRecordEntity
 
@@ -138,13 +138,16 @@ class PayrollViewController:
         
         payrollView = self.model.generatePayrollRecord(employeeNumber, month)
         
-        print(f"=================================================================\n"
-              f"Payslip for the Month of {payrollView.month}\n"
-              f"Employee No.: {payrollView.employeeNumber}\t\tEmployee Name: {payrollView.employeeName}\n"
-              f"Department:   {payrollView.department}\n"
-              f"Rate per Day: {payrollView.ratePerDay}\t\t\tNo. of Days Worked: {payrollView.daysWorked}\n"
-              f"Gross Pay:    {payrollView.grossPay}\n"
-              f"=================================================================")
+        payslip = (f"=================================================================\n"
+                   f"Payslip for the Month of {payrollView.month}\n"
+                   f"Employee No.: {payrollView.employeeNumber}\t\tEmployee Name: {payrollView.employeeName}\n"
+                   f"Department:   {payrollView.department}\n"
+                   f"Rate per Day: {payrollView.ratePerDay}\t\t\tNo. of Days Worked: {payrollView.daysWorked}\n"
+                   f"Gross Pay:    {payrollView.grossPay}\n"
+                   f"=================================================================")
+        self.model.generatePaySlip(payslip, payrollView)
+        print("\nPayslip Generated")
+        print(payslip)
     
     
     # VALIDATORS    
@@ -209,7 +212,9 @@ class PayrollViewController:
     
     def _validateName(self, value):
         """ Name must be characters only """
-        if not value.isalpha():
+        if len(value) == 0:
+            return False
+        if not isAlphaOrSpace(value):
             print("Name Must be Characters Only")
             return False
         return True

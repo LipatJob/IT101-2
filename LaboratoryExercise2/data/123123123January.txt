@@ -1,0 +1,7 @@
+=================================================================
+Payslip for the Month of January
+Employee No.: 123123123		Employee Name: dela paz, james pter
+Department:   Marketing
+Rate per Day: 8.8			No. of Days Worked: 31
+Gross Pay:    272.8
+=================================================================

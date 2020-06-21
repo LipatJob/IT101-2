@@ -2,6 +2,7 @@ from datetime import datetime
 from src.entities.Employee.PayrollRecord import *
 from src.entities.Employee.Employee import *
 from lib.CaseInsensitiveDict import CaseInsensitiveDict
+import os
 
 class ViewModel:
     """ Queries entities to be used in ControllerView """
@@ -17,21 +18,19 @@ class ViewModel:
     def getEmployee(self, id):
         return self._entity.employees.getEmployee(id)
     
+    
     def deleteEmployee(self, id):
         self.getEmployee(id).department.removeEmployee(id)
         self._entity.employees.deleteEmployee(id)
     
+    
     def addEmployee(self, employee):
-        allowance = 0
         
-        if employee["position"] == "Manager":
-            allowance = 5000
-            
-        if employee["position"] == "Assistant Manager":
-            allowance = 3000
-            
         newEmployee = self._employeeFactoy.create(employee["employeeNumber"], employee["lastName"], employee["firstName"], 
-                 employee["position"], employee["department"], employee["birthdate"], employee["ratePerDay"], allowance)
+                 employee["position"], employee["department"], employee["birthdate"], 0, 0)
+        newEmployee.setStartRate()
+        newEmployee.setStartAllowance()
+        
         self._entity.employees.addEmployee(newEmployee)
         self._entity.saveState()
 
@@ -76,15 +75,16 @@ class ViewModel:
         recordView.position         = employee.position
         recordView.ratePerDay       = employee.ratePerDay
         recordView.daysWorked       = record.daysWorked
-        recordView.grossPay         = recordView.ratePerDay * record.daysWorked
+        recordView.allowance        = employee.allowance
+        recordView.grossPay         = (recordView.ratePerDay * record.daysWorked) + employee.allowance
         
         return recordView
-        
-    
+
         
     def generatePayrollRecordSingular(self, employeeNumber, month):
         currentRecord = self._entity.payrollRecords.getRecord(employeeNumber, month)
         return self.generatePayrollRecord(currentRecord)
+      
         
     def generatePayrollRecordMonth(self, month):
         records = []
@@ -93,11 +93,13 @@ class ViewModel:
                 records.append(self.generatePayrollRecord(record))
         return records
     
+    
     def generatePayrollRecordAll(self):
         records = []
         for record in self._entity.payrollRecords.getAllRecords():
             records.append(self.generatePayrollRecord(record))
         return records
+    
     
     def getMonthRecords(self):
         months = set()
@@ -123,17 +125,14 @@ class ViewModel:
         
     
     def isPositionAvailable(self, department, position):
+        department = self.getDepartments()[department]
         positions = self.getPositions()
         position = positions[position]
-        
-        if position not in positions:
-            return False
         
         if position not in self._entity.departments[department].getAvailablePositions():
             return False
         
         return True
-        
         
         
     def getAvailablePositions(self, department):
@@ -155,7 +154,16 @@ class ViewModel:
                 employeeNumbers.add(record.employee.employeeNumber)
         
         return employeeNumbers
-        
+    
+    
+    def writeAllPayslip(self, data):
+        with open(os.getcwd() + "/data/allpayroll.txt", "w") as f:
+            f.write(data)
+            
+    def writeEmployeePayslip(self, data, month, employeeNumber):
+        fileName = os.getcwd() + f"/data/{str(employeeNumber) + str(month)}.txt"
+        with open(fileName, "w") as f:
+            f.write(data)
 
     
     

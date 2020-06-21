@@ -1,4 +1,5 @@
 """ Please open README.md using a markdown editor to see the functionalities of the modules """
+# Text files are stored in the data folder
 
 from payroll.PayrollEntityManagerFactory import PayrollEntityManagerFactory
 from payroll.PayrollViewController import PayrollViewController
@@ -12,3 +13,4 @@ def main():
     viewController.viewMenu()
 
 main()
+

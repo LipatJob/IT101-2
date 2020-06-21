@@ -1,0 +1,2 @@
+ID:         Department:     Position:   Month:     Rate Per Day:   Number of Days Worked:   Allowance   Gross Pay:   
+098098098   Manufacturing   Manager     December   4000            31                       5000        129000       

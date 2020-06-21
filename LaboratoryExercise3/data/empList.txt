@@ -1,2 +1,4 @@
-111111111,Lipat,Job,Manager,Sales,11-30-1010,1000.0,5000.0;
-123123123,Lipat,JOJO,Assistant Manager,Sales,03-12-2020,1000.0,3000
+234234234,Job,Lipat,Secretary,Sales,01-01-0001,1687.5,0.0;
+345345345,Last Name,First Name,Manager,Admin,01-01-0001,8000.0,5000.0;
+123123123,Lipat,Job,Staff,Admin,01-01-0001,1603.125,0.0;
+098098098,Name Last,Name First,Manager,Sales,02-02-0002,1000,5000

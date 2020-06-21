@@ -222,7 +222,9 @@ class CitiesViewController:
                             comparator = multipleValidation(lambda val: val >= 0))
             
             # Ask User if Adjust Active Cases
-            if input("Enter `Y to Adjust Active Cases: ").lower() == "y":
+            currentActive = barangay["Active"]
+            newActive = negativeToZero(barangay["Confirmed"] - (barangay["Recovered"] + barangay["Deceased"]))
+            if input(f"Enter `Y to Adjust Active Cases. {currentActive} - > {newActive}: ").lower() == "y":
                 barangay["Active"] = negativeToZero(barangay["Confirmed"] - (barangay["Recovered"] + barangay["Deceased"]))
                 print("Active Cases Adjusted")
                 
@@ -257,7 +259,9 @@ class CitiesViewController:
                             comparator = multipleValidation(lambda val: val >= 0))
             
             # Ask user if Adjust Active Case
-            if input("Enter `Y to Adjust Active Cases: ").lower() == "y":
+            currentActive = barangay["Active"]
+            newActive = negativeToZero(barangay["Confirmed"] - (barangay["Recovered"] + barangay["Deceased"]))
+            if input(f"Enter `Y to Adjust Active Cases. {currentActive} - > {newActive}: ").lower() == "y":
                 barangay["Active"] = negativeToZero(barangay["Confirmed"] - (barangay["Recovered"] + barangay["Deceased"]))
                 print("Active Cases Adjusted")
                 

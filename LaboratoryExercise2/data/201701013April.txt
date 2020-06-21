@@ -1,0 +1,7 @@
+=================================================================
+Payslip for the Month of April
+Employee No.: 201701013		Employee Name: Simona, Morasca
+Department:   Finance
+Rate per Day: 3600.0			No. of Days Worked: 20
+Gross Pay:    72000.0
+=================================================================

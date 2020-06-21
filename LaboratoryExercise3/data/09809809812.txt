@@ -1,0 +1,8 @@
+=================================================================
+Payslip for the Month of December
+Employee No.: 098098098			Employee Name: Last Name, First Name
+Department:   Manufacturing		Position: Manager
+Rate per Day: 4000			No. of Days Worked: 31
+Allowance: 5000
+Gross Pay:    129000
+=================================================================

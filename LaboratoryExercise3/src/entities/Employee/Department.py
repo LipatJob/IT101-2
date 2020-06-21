@@ -43,7 +43,7 @@ class Department:
         return available
     
     def removeEmployee(self, employeeNumber):
-        for index, employee in self.positions["Staff"]:
+        for index, employee in enumerate(self.positions["Staff"]):
             if employee.employeeNumber == employeeNumber:
                 del self.positions["Staff"][index]   
                      

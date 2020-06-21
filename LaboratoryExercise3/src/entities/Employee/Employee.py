@@ -22,6 +22,8 @@ class Employee:
         self.birthdate = birthdate
         self.ratePerDay = ratePerDay
         self.allowance = allowance
+        self.startSalary = 0
+        self.startAllowance = 0
         self._initDepartment()
     
     @abstractmethod
@@ -30,21 +32,32 @@ class Employee:
     
     def increasePay(self):
         self.ratePerDay += self.ratePerDay * .5
+        
+    def setStartRate(self):
+        self.ratePerDay = self.startRate
+        
+    def setStartAllowance(self):
+        self.allowance = self.startAllowance
 
 
         
 class Manager(Employee):
     def _initDepartment(self):
         self.department.setManager(self)
+        self.startRate = 1000
+        self.startAllowance = 5000
     
     def increasePay(self):
         self.ratePerDay += self.ratePerDay
+        
     
 
         
 class AssistantManager(Employee):
     def _initDepartment(self):
         self.department.setAssistantManager(self)
+        self.startRate = 750
+        self.startAllowance = 3000
         
     def increasePay(self):
         self.ratePerDay += self.ratePerDay
@@ -54,12 +67,14 @@ class AssistantManager(Employee):
 class Secretary(Employee):
     def _initDepartment(self):
         self.department.setSecretary(self)
+        self.startRate = 500
 
 
 
 class Staff(Employee):
     def _initDepartment(self):
         self.department.addStaff(self)
+        self.startRate = 475
         
 
 class Employees:

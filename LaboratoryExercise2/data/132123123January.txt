@@ -1,0 +1,7 @@
+=================================================================
+Payslip for the Month of January
+Employee No.: 132123123		Employee Name: Job, Lipat
+Department:   Accounting
+Rate per Day: 800.0			No. of Days Worked: 10
+Gross Pay:    8000.0
+=================================================================

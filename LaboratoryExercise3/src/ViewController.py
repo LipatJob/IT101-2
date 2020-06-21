@@ -70,15 +70,16 @@ class ViewController:
             tableRow = [employee.employeeNumber, employee.lastName, employee.firstName, employee.position, employee.department.name, employee.ratePerDay, employee.allowance]
             employeeTable.append(tableRow)
         printAsTable(employeeTable)
+        return "Scroll up to see Employee List"
 
 
     def viewSelectUpdateEmployee(self):
-        if len(self.model.getRecordEmployeeNumbers()) == 0:
+        if len(self.model.getEmployeeList()) == 0:
             return "There are no Records"
         self.viewEmployeeList()
         employeeNumber = inputComparator(message = "Enter Employee Number: ", 
                                          errorMessage = "Please Enter a Valid Employee Number.", 
-                                         comparator = multipleValidation(self._validateExistingEmployeeNumber, self._existingEmployeeNumber, self._hasRecord), 
+                                         comparator = multipleValidation(self._validateExistingEmployeeNumber, self._existingEmployeeNumber), 
                                          strip = True)
         self.viewUpdateEmployee(employeeNumber)
         
@@ -109,9 +110,10 @@ class ViewController:
         f"  D\tDepartment: {empEntity.department.name}\n"\
         f"  E\tPosition: {empEntity.position}\n"\
         f"  F\tRate Per Day: {empEntity.ratePerDay}\n"\
-        f"  X\tExit\n"\
+        f"  X\tBack\n"\
         f"--------------------------------------------------------"
         )
+        
         print(menu)
         
         if response != None and response != "":
@@ -158,7 +160,7 @@ class ViewController:
         if selection == "d":
             employee["department"]     = self.model.getDepartments()[inputComparator(message = "Available Departments: Accounting, Human Resources, Sales, Marketing, Manufacturing, Admin\nEnter Department: ", 
                                                                        errorMessage = "Please Enter a Valid Department.", 
-                                                                       comparator = self._validateDepartment, 
+                                                                       comparator = multipleValidation(self._validateDepartment, self._validateDepartmentUpdate(employee["position"])), 
                                                                        strip = True)]
         if selection == "e":
             availablePositions = self.model.getAvailablePositions(employee["department"])
@@ -229,10 +231,6 @@ class ViewController:
         
         employee["birthdate"] = datetime(year = birthYear, month = birthMonth, day = birthDay).strftime('%m-%d-%Y')
         
-        employee["ratePerDay"]    = inputNumber(message = "Enter Rate Per Day: ", 
-                                              errorMessage = "Please Enter a Valid Rate.", 
-                                              comparator = self._validateRate, 
-                                              floatingPoint = True)
         
         # Call Model
         self.model.addEmployee(employee)
@@ -286,7 +284,7 @@ class ViewController:
         self.viewEmployeeList()
         employeeNumber = inputComparator(message = "Enter Employee Number: ", 
                                          errorMessage = "Please Enter a Valid Employee Number.", 
-                                         comparator = multipleValidation(self._validateExistingEmployeeNumber, self._existingEmployeeNumber, self._hasRecord), 
+                                         comparator = multipleValidation(self._validateExistingEmployeeNumber, self._existingEmployeeNumber), 
                                          strip = True)
         oldPay = self.model.getEmployee(employeeNumber).ratePerDay
         self.model.increasePay(employeeNumber)
@@ -380,13 +378,16 @@ class ViewController:
         
         payrollView = self.model.generatePayrollRecordSingular(employeeNumber, month)
         
-        print(f"=================================================================\n"
+        paySlip = (f"=================================================================\n"
               f"Payslip for the Month of {payrollView.month}\n"
               f"Employee No.: {payrollView.employeeNumber}\t\t\tEmployee Name: {payrollView.employeeName}\n"
               f"Department:   {payrollView.department.name}\t\tPosition: {payrollView.position}\n"
               f"Rate per Day: {payrollView.ratePerDay}\t\t\tNo. of Days Worked: {payrollView.daysWorked}\n"
+              f"Allowance: {payrollView.allowance}\n"
               f"Gross Pay:    {payrollView.grossPay}\n"
               f"=================================================================")
+        self.model.writeEmployeePayslip(paySlip, month, employeeNumber)
+        print(paySlip)
     
     
     def viewGeneratePayrollRecordInMonth(self):
@@ -408,12 +409,14 @@ class ViewController:
     
     def viewGeneratePayrollRecordAll(self):
         payrollViews = self.model.generatePayrollRecordAll()
-        payrollTable = [["ID:", "Department:", "Position:", "Month:", "Rate Per Day:", "Number of Days Worked:", "Gross Pay:"]]
+        payrollTable = [["ID:", "Department:", "Position:", "Month:", "Rate Per Day:", "Number of Days Worked:", "Allowance" ,"Gross Pay:"]]
         
         for payrollView in payrollViews:
-            tableRow = [payrollView.employeeNumber, payrollView.department.name,payrollView.position,  payrollView.month, payrollView.ratePerDay, payrollView.daysWorked, payrollView.grossPay]
+            tableRow = [payrollView.employeeNumber, payrollView.department.name,payrollView.position,  payrollView.month, payrollView.ratePerDay, payrollView.daysWorked, payrollView.allowance, payrollView.grossPay]
             payrollTable.append(tableRow)
         printAsTable(payrollTable)
+        self.model.writeAllPayslip(toTable(payrollTable))
+        
     
     
     # VALIDATORS    
@@ -486,7 +489,9 @@ class ViewController:
     
     def _validateName(self, value):
         """ Name must be characters only """
-        if not value.isalpha():
+        if len(value) == 0:
+            return False
+        if not isAlphaOrSpace(value):
             print("Name Must be Characters Only")
             return False
         return True
@@ -619,7 +624,18 @@ class ViewController:
                 return isValidMonthDate(month, value)
         return validate
     
+    
     def _noDelimiter(self, value):
         if ',' in value or ';' in value:
             return False
         return True
+    
+    
+    def _validateDepartmentUpdate(self, position):
+        print("Validating position")
+        def validate(department):
+            if not self._validatePosition(department)(position):
+                return False
+            return True
+        return validate
+        

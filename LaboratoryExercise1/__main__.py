@@ -5,7 +5,7 @@ Author: Job Lipat
 Date Created: May 10, 2020
 
 
-# Responsibilities of Modules:
+# Responsibilities of Modules and Recommended Checking Order:
 __main__                                  -> The entry point of the program
 empData                                   -> Contains the raw data
 employees.EmployeesViewController         -> The user interface. Handles data input and output. Gets data from model
